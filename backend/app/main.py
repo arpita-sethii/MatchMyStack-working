@@ -21,6 +21,36 @@ logger = logging.getLogger(__name__)
 # Create DB tables
 Base.metadata.create_all(bind=engine)
 
+# Add missing columns if needed (migration)
+from sqlalchemy import inspect, text
+
+def migrate_database():
+    """Add missing columns to existing tables"""
+    try:
+        inspector = inspect(engine)
+        
+        # Check users table
+        if 'users' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('users')]
+            
+            if 'updated_at' not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
+                logger.info("✅ Added updated_at column to users table")
+            
+            # Add other missing columns if needed
+            if 'google_id' not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN google_id TEXT"))
+                logger.info("✅ Added google_id column to users table")
+        
+        logger.info("✅ Database migration completed successfully")
+    except Exception as e:
+        logger.error(f"❌ Database migration error: {e}")
+
+# Run migration
+migrate_database()
+
 # Create FastAPI app
 app = FastAPI(title="MatchMyStack - Backend API", version="1.0.0")
 
