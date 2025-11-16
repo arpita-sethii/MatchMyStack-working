@@ -21,6 +21,51 @@ logger = logging.getLogger(__name__)
 # Create DB tables
 Base.metadata.create_all(bind=engine)
 
+# Add missing columns if needed (migration)
+from sqlalchemy import inspect, text
+
+def migrate_database():
+    """Add missing columns to existing tables and handle column renames"""
+    try:
+        inspector = inspect(engine)
+        
+        # Check users table
+        if 'users' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('users')]
+            
+            # Handle email_verified -> is_verified migration
+            if 'email_verified' in columns and 'is_verified' not in columns:
+                with engine.begin() as conn:
+                    # Add is_verified column
+                    conn.execute(text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 0 NOT NULL"))
+                    # Copy data from email_verified to is_verified
+                    conn.execute(text("UPDATE users SET is_verified = email_verified"))
+                logger.info("✅ Added is_verified column and migrated data from email_verified")
+            elif 'is_verified' not in columns:
+                # If neither exists, add is_verified
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 0 NOT NULL"))
+                logger.info("✅ Added is_verified column to users table")
+            
+            # Add updated_at if missing
+            if 'updated_at' not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
+                logger.info("✅ Added updated_at column to users table")
+            
+            # Add google_id if missing
+            if 'google_id' not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN google_id TEXT"))
+                logger.info("✅ Added google_id column to users table")
+        
+        logger.info("✅ Database migration completed successfully")
+    except Exception as e:
+        logger.error(f"❌ Database migration error: {e}")
+
+# Run migration
+migrate_database()
+
 # Create FastAPI app
 app = FastAPI(title="MatchMyStack - Backend API", version="1.0.0")
 

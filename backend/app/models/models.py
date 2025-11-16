@@ -11,13 +11,13 @@ class User(Base):
     hashed_password = Column(String, nullable=True)
     
     google_id = Column(String, unique=True, nullable=True, index=True)
-    is_verified = Column(Boolean, default=False)
+    is_verified = Column(Boolean, default=False, nullable=False)
     bio = Column(Text, nullable=True)
     role = Column(String, nullable=True)
     skills = Column(JSON, nullable=True)
     embedding = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True)
-    email_verified = Column(Boolean, default=False, nullable=False)
+    # email_verified = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=False), server_default=func.now())  # ✅ FIXED
     resumes = relationship("Resume", back_populates="user")
     projects = relationship("Project", back_populates="owner")
