@@ -47,7 +47,7 @@ export default function Index() {
 
            <div className="flex items-center justify-center">
             <img
-              src="matchmystack-fd\public\pics\hero.png"
+              src="/pics/hero.png"
               alt="Team collaboration illustration"
               className="max-h-64 md:max-h-80 lg:max-h-[360px] object-cover rounded-2xl shadow-lg"
               loading="lazy"
