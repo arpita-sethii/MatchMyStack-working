@@ -23,9 +23,9 @@ export default function Index() {
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <Button size="lg" asChild>
+              {/* <Button size="lg" asChild>
                 <a href="/auth">Create your profile</a>
-              </Button>
+              </Button> */}
               {/* <Button variant="secondary" size="lg" asChild>
                 <a href="#demo">Try the swipe demo</a>
               </Button> */}
@@ -47,7 +47,7 @@ export default function Index() {
 
            <div className="flex items-center justify-center">
             <img
-              src="/pics/hero.png"
+              src="matchmystack-fd\public\pics\hero.png"
               alt="Team collaboration illustration"
               className="max-h-64 md:max-h-80 lg:max-h-[360px] object-cover rounded-2xl shadow-lg"
               loading="lazy"
